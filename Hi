@@ -1,0 +1,105 @@
+/*
+ * Locket Gold Unlock Script cho Shadowrocket
+ * Tên file: locket.js
+ */
+
+let body = $response.body;
+
+if (body) {
+    try {
+        let obj = JSON.parse(body);
+
+        if (!obj.entries) {
+            obj.entries = {};
+        }
+
+        // 1. Kích hoạt Locket Gold và các tính năng Premium
+        obj.entries["purchases_enabled"] = "true";
+        obj.entries["purchases_entitlement"] = "Gold";
+        obj.entries["gold_member"] = "true";
+        obj.entries["gold_membership"] = "true";
+        obj.entries["gold_card"] = "true";
+        obj.entries["gold_since"] = "true";
+        obj.entries["gold_since_badge_enabled"] = "true";
+        obj.entries["gold_member_since_enabled"] = "true";
+        obj.entries["gold_membership_card"] = "true";
+        obj.entries["locket_gold_badge"] = "true";
+        obj.entries["locket_gold_badge_small"] = "true";
+
+        // 2. Mở khóa Video 30s & Đăng từ Camera Roll
+        obj.entries["gold_max_duration"] = "30.0";
+        obj.entries["max_video_duration"] = "30.0";
+        obj.entries["longer_video_enabled"] = "true";
+        obj.entries["longer_videos_enabled"] = "true";
+        obj.entries["camera_roll_preview_enabled"] = "true";
+        obj.entries["upload_use_heif_main"] = "true";
+        obj.entries["live_photos_capture_enabled"] = "true";
+        obj.entries["live_photos_viewing_enabled"] = "true";
+
+        // 3. Khung viền Widget & Icon App
+        obj.entries["custom_widget_frames_unlocked"] = "true";
+        obj.entries["custom_widget_frames_enabled"] = "true";
+        obj.entries["widget_frames_unlocked"] = "true";
+        obj.entries["widget_frames_enabled"] = "true";
+        obj.entries["app_icon_picker"] = "true";
+        obj.entries["music_caption_enabled"] = "true";
+
+        // 4. Chặn quảng cáo
+        obj.entries["history_ads_mode"] = "disabled";
+        obj.entries["history_ads_floor_price"] = "0";
+
+        // 5. Mở khóa toàn bộ cổng tính năng ẩn (Feature Gates)
+        obj.entries["feature_gates"] = JSON.stringify({
+            "app_icon_picker": "enabled",
+            "camera_roll": "enabled",
+            "camera_theme": "enabled",
+            "locket_views": "enabled",
+            "long_captions": "enabled",
+            "longer_video": "enabled",
+            "unlimited_friends": "enabled",
+            "profile_badge": "enabled",
+            "remove_ads": "subscriber",
+            "custom_widget_frames": "enabled",
+            "longerVideo": "enabled",
+            "video": "enabled",
+            "widget_frame": "enabled",
+            "widget_frame_event": "enabled",
+            "widget_frame_events": "enabled",
+            "live_photos": "enabled",
+            "live_photos_capture": "enabled",
+            "live_photos_viewing": "enabled",
+            "gold_camera_themes": "enabled",
+            "profileBadge": "enabled",
+            "gold_badge": "enabled",
+            "gold_since": "enabled",
+            "profile_gold_badge": "enabled",
+            "profile_gold_card": "enabled",
+            "groups": "enabled"
+        });
+
+        // 6. Tùy biến popup chào mừng Gold
+        obj.entries["feature_discovery_popup_config"] = JSON.stringify({
+            "tag": "LOCKET GOLD",
+            "tag_gradient": true,
+            "title": "Lên đời Gold rồi nha 😎",
+            "feature_set": [{
+                "title": "Giàu rồi đó! 🤑",
+                "body": "Tài khoản đã full Locket Gold Premium. Flex với hội bạn thôi nào 🔥",
+                "imageURL": "https://firebaseremoteconfig.googleapis.com/locket_welcome.jpg"
+            }],
+            "campaign": "locket_gold_welcome_v1",
+            "start_at": "2024-01-01T00:00:00",
+            "end_at": "2030-12-31T23:59:59",
+            "use_local_time_zone": true
+        });
+
+        // Ép Firebase cập nhật config mới này vào máy
+        obj.state = "UPDATE";
+
+        body = JSON.stringify(obj);
+    } catch (e) {
+        console.log("Locket Script Error: " + e);
+    }
+}
+
+$done({ body });
