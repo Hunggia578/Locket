@@ -1,5 +1,6 @@
 /*
- * Locket Gold Unlock Script - Trích xuất chuẩn từ RemoteConfig_2.sqlite3
+ * Locket Gold Unlock Script cho Shadowrocket
+ * Tên file: locket.js (Bản hoàn chỉnh - Fix Âm thanh & Chú thích)
  */
 
 let body = $response.body;
@@ -7,101 +8,146 @@ let body = $response.body;
 if (body) {
     try {
         let obj = JSON.parse(body);
-        if (!obj.entries) obj.entries = {};
 
-        // Hàm hỗ trợ gán giá trị an toàn
-        const setKey = (k, v) => { obj.entries[k] = v; };
+        if (!obj.entries) {
+            obj.entries = {};
+        }
 
-        // 1. MỞ KHÓA TÀI KHOẢN GOLD
-        setKey("purchases_enabled", "true");
-        setKey("purchases_entitlement", "Gold");
-        setKey("gold_member", "true");
-        setKey("gold_membership", "true");
-        setKey("gold_card", "true");
-        setKey("gold_since", "true");
-        setKey("gold_since_badge_enabled", "true");
-        setKey("gold_member_since_enabled", "true");
-        setKey("locket_gold_badge", "true");
-        setKey("profile_gold_badge", "true");
-        setKey("gold_membership_card", "true");
+        // 1. Kích hoạt Locket Gold và các tính năng Premium
+        obj.entries["purchases_enabled"] = "true";
+        obj.entries["purchases_entitlement"] = "Gold";
+        obj.entries["gold_member"] = "true";
+        obj.entries["gold_membership"] = "true";
+        obj.entries["gold_card"] = "true";
+        obj.entries["gold_since"] = "true";
+        obj.entries["gold_since_badge_enabled"] = "true";
+        obj.entries["gold_member_since_enabled"] = "true";
+        obj.entries["gold_membership_card"] = "true";
+        obj.entries["locket_gold_badge"] = "true";
+        obj.entries["locket_gold_badge_small"] = "true";
 
-        // 2. MỞ KHÓA TÍNH NĂNG CHÚ THÍCH (THỜI TIẾT, GIỜ, NHẠC) CHUẨN DATA GỐC
-        setKey("captions_enabled", "true");
-        setKey("long_captions", "true");
-        setKey("music_caption_enabled", "true");
-        setKey("overlay_navigator_enabled", "true");
+        // 2. Mở khóa Video 30s, Âm thanh & Đăng từ Camera Roll
+        obj.entries["gold_max_duration"] = "30.0";
+        obj.entries["max_video_duration"] = "30.0";
+        obj.entries["longer_video_enabled"] = "true";
+        obj.entries["longer_videos_enabled"] = "true";
+        obj.entries["camera_roll_preview_enabled"] = "true";
+        obj.entries["upload_use_heif_main"] = "true";
+        obj.entries["live_photos_capture_enabled"] = "true";
+        obj.entries["live_photos_viewing_enabled"] = "true";
         
-        setKey("overlays_config", JSON.stringify({
+        // FIX ÂM THANH VIDEO
+        obj.entries["video_sound_enabled"] = "true";
+        obj.entries["microphone_enabled"] = "true";
+        obj.entries["camera_microphone_enabled"] = "true";
+
+        // 3. Khung viền Widget, Icon App
+        obj.entries["custom_widget_frames_unlocked"] = "true";
+        obj.entries["custom_widget_frames_enabled"] = "true";
+        obj.entries["widget_frames_unlocked"] = "true";
+        obj.entries["widget_frames_enabled"] = "true";
+        obj.entries["app_icon_picker"] = "true";
+
+        // ==========================================
+        // 4. FIX TÍNH NĂNG CHÚ THÍCH (OVERLAYS/STICKERS)
+        // ==========================================
+        obj.entries["captions_enabled"] = "true";
+        obj.entries["long_captions"] = "true";
+        obj.entries["music_caption_enabled"] = "true";
+        
+        obj.entries["overlays_config"] = JSON.stringify({
             "legacy_captions_enabled": true,
             "send_enabled": true,
             "view_enabled": true
-        }));
-        setKey("overlays_v2_config", JSON.stringify({
-            "suggestions_enabled": true
-        }));
-        setKey("overlay_dynamic_captions", JSON.stringify([
-            "standard", "location", "weather", "time"
-        ]));
-
-        // 3. FIX LỖI CAMERA & ÂM THANH VIDEO (Bơm chính xác chuỗi JSON của app)
-        setKey("video_sound_enabled", "true");
-        setKey("microphone_enabled", "true");
-        setKey("camera_microphone_enabled", "true");
-        setKey("longer_video_enabled", "true");
-        setKey("longer_videos_enabled", "true");
-        setKey("gold_max_duration", "30.0");
-        setKey("max_video_duration", "30.0");
-
-        setKey("camera", JSON.stringify({
-            "gold_max_duration": 30,
-            "goldMaxDuration": 30,
-            "ultra_wide": true,
-            "ultraWide": true,
-            "volume_button": true,
-            "volumeButton": true,
-            "flash_button": true,
-            "telephoto": true,
-            "srgb": true,
-            "quality_mbps": 1.2,
-            "qualityMbps": 1.2
-        }));
-
-        // 4. MỞ KHÓA UPLOAD THƯ VIỆN & UI KHUNG WIDGET
-        setKey("camera_roll_preview_enabled", "true");
-        setKey("upload_use_heif_main", "true");
-        setKey("live_photos_capture_enabled", "true");
-        setKey("live_photos_viewing_enabled", "true");
+        });
         
-        setKey("custom_widget_frames_unlocked", "true");
-        setKey("custom_widget_frames_enabled", "true");
-        setKey("widget_frames_unlocked", "true");
-        setKey("widget_frames_enabled", "true");
-        setKey("app_icon_picker", "true");
+        obj.entries["overlays_v2_config"] = JSON.stringify({
+            "suggestions_enabled": true
+        });
+        
+        obj.entries["overlay_dynamic_captions"] = JSON.stringify([
+            "standard", "location", "weather", "time"
+        ]);
+        
+        // Data danh sách Nhãn dán / Meme hiển thị khi vuốt lên
+        obj.entries["overlay_items"] = JSON.stringify([
+            {
+                "section": "Công cụ",
+                "items": [
+                    {"overlay_id": "caption:standard", "source": "local", "caption": {"type": "standard"}},
+                    {"overlay_id": "caption:music", "source": "local", "caption": {"type": "music"}},
+                    {"overlay_id": "caption:time", "source": "local", "caption": {"type": "time"}},
+                    {"overlay_id": "caption:weather", "source": "local", "caption": {"type": "weather"}},
+                    {"overlay_id": "caption:location", "source": "local", "caption": {"type": "location"}}
+                ]
+            },
+            {
+                "section": "Meme Việt",
+                "items": [
+                    {"overlay_id": "meme:song_ao", "source": "remote", "caption": {"type": "static_content", "max_lines": 1, "text": "Sống ảo tí", "text_color": "#FFFFFF", "icon": {"type": "emoji", "data": "📸"}, "background": {"colors": ["#8E2DE2", "#4A00E0"], "material_blur": "thick"}}},
+                    {"overlay_id": "meme:dep_trai", "source": "remote", "caption": {"type": "static_content", "max_lines": 1, "text": "Đẹp trai có gì sai", "text_color": "#FFFFFF", "icon": {"type": "emoji", "data": "😎"}, "background": {"colors": ["#0F2027", "#2C5364"], "material_blur": "thick"}}},
+                    {"overlay_id": "meme:xinh_san", "source": "remote", "caption": {"type": "static_content", "max_lines": 1, "text": "Xinh sẵn rồi", "text_color": "#4A2E00", "icon": {"type": "emoji", "data": "💅"}, "background": {"colors": ["#FFDEE9", "#B5FFFC"], "material_blur": "thick"}}}
+                ]
+            }
+        ]);
+        // ==========================================
 
-        // 5. CHẶN QUẢNG CÁO
-        setKey("history_ads_mode", "disabled");
-        setKey("history_ads_floor_price", "0");
+        // 5. Chặn quảng cáo
+        obj.entries["history_ads_mode"] = "disabled";
+        obj.entries["history_ads_floor_price"] = "0";
 
-        // 6. GHI ĐÈ CỔNG TÍNH NĂNG (Feature Gates)
-        let gates = {};
-        if (obj.entries["feature_gates"]) {
-            try { gates = JSON.parse(obj.entries["feature_gates"]); } catch(e){}
-        }
-        const unlockFeatures = [
-            "app_icon_picker", "camera_roll", "camera_theme", "locket_views", 
-            "long_captions", "longer_video", "unlimited_friends", "profile_badge", 
-            "custom_widget_frames", "longerVideo", "video", "widget_frame", 
-            "live_photos", "gold_camera_themes", "gold_badge", "groups",
-            "widget_frame_events", "seasonal_theme", "event_theme"
-        ];
-        for (let f of unlockFeatures) gates[f] = "enabled";
-        gates["remove_ads"] = "subscriber";
-        setKey("feature_gates", JSON.stringify(gates));
+        // 6. Mở khóa toàn bộ cổng tính năng ẩn (Feature Gates)
+        obj.entries["feature_gates"] = JSON.stringify({
+            "app_icon_picker": "enabled",
+            "camera_roll": "enabled",
+            "camera_theme": "enabled",
+            "locket_views": "enabled",
+            "long_captions": "enabled",
+            "longer_video": "enabled",
+            "unlimited_friends": "enabled",
+            "profile_badge": "enabled",
+            "remove_ads": "subscriber",
+            "custom_widget_frames": "enabled",
+            "longerVideo": "enabled",
+            "video": "enabled",
+            "widget_frame": "enabled",
+            "widget_frame_event": "enabled",
+            "widget_frame_events": "enabled",
+            "live_photos": "enabled",
+            "live_photos_capture": "enabled",
+            "live_photos_viewing": "enabled",
+            "gold_camera_themes": "enabled",
+            "profileBadge": "enabled",
+            "gold_badge": "enabled",
+            "gold_since": "enabled",
+            "profile_gold_badge": "enabled",
+            "profile_gold_card": "enabled",
+            "groups": "enabled"
+        });
 
+        // 7. Tùy biến popup chào mừng Gold
+        obj.entries["feature_discovery_popup_config"] = JSON.stringify({
+            "tag": "LOCKET GOLD",
+            "tag_gradient": true,
+            "title": "Lên đời Gold rồi nha 😎",
+            "feature_set": [{
+                "title": "Giàu rồi đó! 🤑",
+                "body": "Tài khoản đã full Locket Gold Premium.",
+                "imageURL": "https://firebaseremoteconfig.googleapis.com/locket_welcome.jpg"
+            }],
+            "campaign": "locket_gold_welcome_v1",
+            "start_at": "2024-01-01T00:00:00",
+            "end_at": "2030-12-31T23:59:59",
+            "use_local_time_zone": true
+        });
+
+        // Ép Firebase cập nhật config mới này vào máy
         obj.state = "UPDATE";
+
         body = JSON.stringify(obj);
     } catch (e) {
         console.log("Locket Script Error: " + e);
     }
 }
+
 $done({ body });
