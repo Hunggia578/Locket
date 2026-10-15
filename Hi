@@ -1,5 +1,5 @@
 /*
- * Locket Gold Unlock - Bản giữ nguyên 100% data gốc
+ * Locket Gold Unlock Script - Trích xuất chuẩn từ RemoteConfig_2.sqlite3
  */
 
 let body = $response.body;
@@ -7,71 +7,101 @@ let body = $response.body;
 if (body) {
     try {
         let obj = JSON.parse(body);
+        if (!obj.entries) obj.entries = {};
 
-        if (!obj.entries) {
-            obj.entries = {};
+        // Hàm hỗ trợ gán giá trị an toàn
+        const setKey = (k, v) => { obj.entries[k] = v; };
+
+        // 1. MỞ KHÓA TÀI KHOẢN GOLD
+        setKey("purchases_enabled", "true");
+        setKey("purchases_entitlement", "Gold");
+        setKey("gold_member", "true");
+        setKey("gold_membership", "true");
+        setKey("gold_card", "true");
+        setKey("gold_since", "true");
+        setKey("gold_since_badge_enabled", "true");
+        setKey("gold_member_since_enabled", "true");
+        setKey("locket_gold_badge", "true");
+        setKey("profile_gold_badge", "true");
+        setKey("gold_membership_card", "true");
+
+        // 2. MỞ KHÓA TÍNH NĂNG CHÚ THÍCH (THỜI TIẾT, GIỜ, NHẠC) CHUẨN DATA GỐC
+        setKey("captions_enabled", "true");
+        setKey("long_captions", "true");
+        setKey("music_caption_enabled", "true");
+        setKey("overlay_navigator_enabled", "true");
+        
+        setKey("overlays_config", JSON.stringify({
+            "legacy_captions_enabled": true,
+            "send_enabled": true,
+            "view_enabled": true
+        }));
+        setKey("overlays_v2_config", JSON.stringify({
+            "suggestions_enabled": true
+        }));
+        setKey("overlay_dynamic_captions", JSON.stringify([
+            "standard", "location", "weather", "time"
+        ]));
+
+        // 3. FIX LỖI CAMERA & ÂM THANH VIDEO (Bơm chính xác chuỗi JSON của app)
+        setKey("video_sound_enabled", "true");
+        setKey("microphone_enabled", "true");
+        setKey("camera_microphone_enabled", "true");
+        setKey("longer_video_enabled", "true");
+        setKey("longer_videos_enabled", "true");
+        setKey("gold_max_duration", "30.0");
+        setKey("max_video_duration", "30.0");
+
+        setKey("camera", JSON.stringify({
+            "gold_max_duration": 30,
+            "goldMaxDuration": 30,
+            "ultra_wide": true,
+            "ultraWide": true,
+            "volume_button": true,
+            "volumeButton": true,
+            "flash_button": true,
+            "telephoto": true,
+            "srgb": true,
+            "quality_mbps": 1.2,
+            "qualityMbps": 1.2
+        }));
+
+        // 4. MỞ KHÓA UPLOAD THƯ VIỆN & UI KHUNG WIDGET
+        setKey("camera_roll_preview_enabled", "true");
+        setKey("upload_use_heif_main", "true");
+        setKey("live_photos_capture_enabled", "true");
+        setKey("live_photos_viewing_enabled", "true");
+        
+        setKey("custom_widget_frames_unlocked", "true");
+        setKey("custom_widget_frames_enabled", "true");
+        setKey("widget_frames_unlocked", "true");
+        setKey("widget_frames_enabled", "true");
+        setKey("app_icon_picker", "true");
+
+        // 5. CHẶN QUẢNG CÁO
+        setKey("history_ads_mode", "disabled");
+        setKey("history_ads_floor_price", "0");
+
+        // 6. GHI ĐÈ CỔNG TÍNH NĂNG (Feature Gates)
+        let gates = {};
+        if (obj.entries["feature_gates"]) {
+            try { gates = JSON.parse(obj.entries["feature_gates"]); } catch(e){}
         }
-
-        // 1. Kích hoạt cờ Locket Gold & Premium
-        obj.entries["purchases_enabled"] = "true";
-        obj.entries["purchases_entitlement"] = "Gold";
-        obj.entries["gold_member"] = "true";
-        obj.entries["gold_membership"] = "true";
-        obj.entries["gold_card"] = "true";
-        obj.entries["gold_since"] = "true";
-        obj.entries["gold_since_badge_enabled"] = "true";
-        obj.entries["gold_member_since_enabled"] = "true";
-        obj.entries["locket_gold_badge"] = "true";
-
-        // 2. Ép bật Âm thanh, Mic và Video 30s
-        obj.entries["gold_max_duration"] = "30.0";
-        obj.entries["max_video_duration"] = "30.0";
-        obj.entries["longer_video_enabled"] = "true";
-        obj.entries["longer_videos_enabled"] = "true";
-        obj.entries["video_sound_enabled"] = "true";
-        obj.entries["microphone_enabled"] = "true";
-        obj.entries["camera_microphone_enabled"] = "true";
-
-        // 3. Mở khóa Khung Widget & Tải ảnh từ thư viện
-        obj.entries["camera_roll_preview_enabled"] = "true";
-        obj.entries["upload_use_heif_main"] = "true";
-        obj.entries["custom_widget_frames_unlocked"] = "true";
-        obj.entries["custom_widget_frames_enabled"] = "true";
-        obj.entries["widget_frames_unlocked"] = "true";
-        obj.entries["widget_frames_enabled"] = "true";
-        obj.entries["app_icon_picker"] = "true";
-
-        // 4. Kích hoạt tính năng Chú thích & Nhạc
-        obj.entries["captions_enabled"] = "true";
-        obj.entries["long_captions"] = "true";
-        obj.entries["music_caption_enabled"] = "true";
-        // CHÚ Ý: Tuyệt đối không can thiệp vào obj.entries["overlay_items"] để giữ nguyên kho Meme gốc từ Server.
-
-        // 5. Chặn quảng cáo
-        obj.entries["history_ads_mode"] = "disabled";
-        obj.entries["history_ads_floor_price"] = "0";
-
-        // 6. Mở khóa cổng tính năng (Feature Gates)
-        let gates = obj.entries["feature_gates"] ? JSON.parse(obj.entries["feature_gates"]) : {};
-        let unlockFeatures = [
+        const unlockFeatures = [
             "app_icon_picker", "camera_roll", "camera_theme", "locket_views", 
             "long_captions", "longer_video", "unlimited_friends", "profile_badge", 
             "custom_widget_frames", "longerVideo", "video", "widget_frame", 
-            "live_photos", "gold_camera_themes", "gold_badge", "groups"
+            "live_photos", "gold_camera_themes", "gold_badge", "groups",
+            "widget_frame_events", "seasonal_theme", "event_theme"
         ];
-        for (let f of unlockFeatures) {
-            gates[f] = "enabled";
-        }
+        for (let f of unlockFeatures) gates[f] = "enabled";
         gates["remove_ads"] = "subscriber";
-        obj.entries["feature_gates"] = JSON.stringify(gates);
+        setKey("feature_gates", JSON.stringify(gates));
 
-        // Bắt buộc app nhận cấu hình
         obj.state = "UPDATE";
-
         body = JSON.stringify(obj);
     } catch (e) {
         console.log("Locket Script Error: " + e);
     }
 }
-
 $done({ body });
